@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 
+
 void print_items(int highlighted, const std::vector<std::string> &items);
 
 const char *modeToString(int mode);
@@ -35,10 +36,11 @@ int main() {
             break;
         } else if (mode == Mode::NORMAL && key == 'i') {
             mode = Mode::INSERT;
-        } else if (mode == Mode::INSERT && key == 27) {
+        } else if (mode == Mode::INSERT && key == 27) { //27 is the Esc key
             mode = Mode::NORMAL;
+        } else if (key == 410) {
+            clear();
         }
-        refresh();
     }
     endwin();
 
@@ -57,6 +59,7 @@ void print_items(int highlighted, const std::vector<std::string> &items) {
         } else {
             printw(entry.c_str());
         }
+
         index++;
     }
 }
