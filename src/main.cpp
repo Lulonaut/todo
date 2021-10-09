@@ -38,7 +38,7 @@ int main() {
             mode = Mode::INSERT;
         } else if (mode == Mode::INSERT && key == 27) { //27 is the Esc key
             mode = Mode::NORMAL;
-        } else if (key == 410) {
+        } else if (key == 410) { //410 is the code for a screen resize
             clear();
         }
     }
@@ -49,18 +49,16 @@ int main() {
 
 void print_items(int highlighted, const std::vector<std::string> &items) {
     wmove(stdscr, 0, 0);
-    int index = 0;
-    for (auto entry: items) {
-        entry += "\n";
-        if (index == highlighted) {
+    int size = static_cast<int>(items.size());
+    for (int i = 0; i < size; i++) {
+        std::string entry = items.at(i) + "\n";
+        if (i == highlighted) {
             wattron(stdscr, A_STANDOUT);
             printw(entry.c_str());
             wattroff(stdscr, A_STANDOUT);
         } else {
             printw(entry.c_str());
         }
-
-        index++;
     }
 }
 
