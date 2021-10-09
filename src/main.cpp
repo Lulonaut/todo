@@ -1,18 +1,20 @@
 #include <ncurses.h>
 #include <string>
 #include <vector>
+#include <iostream>
 
 
 void print_items(int highlighted, const std::vector<std::string> &items);
 
 const char *modeToString(int mode);
 
+int highlight_change(int highlighted, int change, const std::vector<std::string> &items);
+
 enum Mode {
     NORMAL,
     INSERT
 };
 static const char *modeStrings[] = {"NORMAL", "INSERT"};
-
 
 int main() {
     Mode mode = NORMAL;
@@ -32,22 +34,47 @@ int main() {
 
         print_items(highlighted, items);
         int key = getch();
-        if (mode == Mode::NORMAL && key == 'q') {
-            break;
-        } else if (mode == Mode::NORMAL && key == 'i') {
-            mode = Mode::INSERT;
-        } else if (mode == Mode::INSERT && key == 27) { //27 is the Esc key
-            mode = Mode::NORMAL;
-        } else if (key == 410) { //410 is the code for a screen resize
+        if (key == 410) { //410 is the code for a screen resize
             clear();
+            continue;
+        }
+        if (mode == Mode::NORMAL) {
+            switch (key) {
+                case 'q':
+                    endwin();
+                    exit(0);
+                case 'j':
+                    highlighted = highlight_change(highlighted, 1, items);
+                    break;
+                case 'k':
+                    highlighted = highlight_change(highlighted, -1, items);
+                    break;
+                case 'i':
+                    mode = Mode::INSERT;
+                    break;
+                default:
+                    break;
+            }
+        } else if (key == 27) { //27 is the Esc key
+            mode = Mode::NORMAL;
+        } else {
+            if (key == 127) { //Backspace
+                std::string at = items.at(highlighted);
+                if (!at.empty()) {
+                    at.pop_back();
+                    items[highlighted] = at;
+                }
+            } else {
+                std::string at = items.at(highlighted);
+                at.push_back(char(key));
+                items[highlighted] = at;
+            }
         }
     }
-    endwin();
-
-    return 0;
 }
 
 void print_items(int highlighted, const std::vector<std::string> &items) {
+    //move to the beginning of the screen
     wmove(stdscr, 0, 0);
     int size = static_cast<int>(items.size());
     for (int i = 0; i < size; i++) {
@@ -60,6 +87,15 @@ void print_items(int highlighted, const std::vector<std::string> &items) {
             printw(entry.c_str());
         }
     }
+}
+
+int highlight_change(int highlighted, int change, const std::vector<std::string> &items) {
+    int item_size = static_cast<int>(items.size());
+    int res = highlighted + change;
+    if (res > item_size - 1 || res < 0) {
+        return highlighted;
+    }
+    return highlighted + change;
 }
 
 const char *modeToString(int mode) {
