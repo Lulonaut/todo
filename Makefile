@@ -1,9 +1,9 @@
 CC=g++
-CFLAGS=-std=c++20 -Wall -Wextra -lncurses -lfmt -O3
+CFLAGS=-std=c++20 -Wall -Wextra -lncurses -O3 -o todo
 SRC=src/main.cpp
 
 all: $(SRC)
-	$(CC) $(SRC) $(CFLAGS) -o todo
+	$(CC) $(SRC) $(CFLAGS)
 
 clean:
 	@-rm todo
